@@ -25,7 +25,7 @@ const LevelSelection: React.FC = () => {
     if (name) {
       setPlayerName(name);
     } else {
-      navigate("/"); // Redirige a la pantalla de inicio si no hay nombre guardado
+      navigate("/"); 
     }
   }, [navigate]);
 
