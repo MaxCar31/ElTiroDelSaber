@@ -9,10 +9,10 @@ const App: React.FC = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<LevelSelection />} />
+                <Route path="/" element={<FinalScreen />} />
                 <Route path="/levels" element={<WelcomeScreen />} />
                 <Route path="/questions" element={<QuestionScreen />} />
-                <Route path="/final" element={<FinalScreen />} />
+                <Route path="/final" element={<LevelSelection />} />
             </Routes>
         </Router>
     );
