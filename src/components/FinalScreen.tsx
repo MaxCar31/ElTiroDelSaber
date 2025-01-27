@@ -66,9 +66,9 @@ const FinalScreen: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-purple-100 to-indigo-100 p-4">
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-4">
       {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
-      <Card className="w-full max-w-md" role="main" tabIndex={-1}>
+      <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm" role="main" tabIndex={-1}>
         <CardHeader>
           <CardTitle className="text-3xl font-bold text-center mb-2" tabIndex={0}>
             ¡Juego Terminado!

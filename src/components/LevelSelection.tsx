@@ -45,8 +45,8 @@ const LevelSelection: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-purple-100 to-indigo-100 p-4">
-      <motion.div role="main" tabIndex={-1}>
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-4">
+      <motion.div role="main" tabIndex={-1} className="w-full max-w-md">
         <h1 className="text-4xl font-bold text-indigo-600 mb-6 text-center">Selecciona Nivel</h1>
         <p className="text-center text-gray-700 mb-6">
           Bienvenido, <span className="font-semibold">{playerName}</span>. ¡Selecciona un nivel para comenzar!

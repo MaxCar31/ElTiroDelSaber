@@ -174,7 +174,7 @@ const QuestionScreen: React.FC = () => {
 
   return (
     <div 
-      className="relative p-6 bg-gradient-to-b from-purple-100 to-indigo-100 min-h-screen flex flex-col items-center"
+      className="relative p-6 min-h-screen flex flex-col items-center"
       onKeyDown={handleKeyNavigation}
       role="application"
       aria-label="Pantalla de preguntas"

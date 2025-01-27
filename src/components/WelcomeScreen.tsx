@@ -50,12 +50,12 @@ const WelcomeScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b  from-purple-100 to-indigo-100 p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full"
+        className="bg-white/90 backdrop-blur-sm rounded-lg shadow-xl p-8 max-w-md w-full"
         role="main"
         tabIndex={-1}
       >
