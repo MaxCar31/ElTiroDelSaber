@@ -30,9 +30,10 @@ const QuestionScreen: React.FC = () => {
   const [hitTarget, setHitTarget] = useState<number | null>(null);
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(15); // Aumentado a 15 segundos
   const [isMuted, setIsMuted] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -72,9 +73,24 @@ const QuestionScreen: React.FC = () => {
     setRotation(-25 + idx * 30);
     setShowGif(true);
 
+    // Encontrar la respuesta correcta
+    const correctAnswer = questions[currentQuestion].opciones.find((opt: any) => opt.correcta);
+
+    // Mensaje modificado para incluir la respuesta correcta
+    const message = isCorrect 
+      ? "¡Respuesta Correcta! ¡Felicitaciones!" 
+      : `Respuesta Incorrecta. La respuesta correcta era: ${correctAnswer.texto}`;
+    setAnnouncement(message);
+    setFeedbackMessage(message);
+
+    // Reproducir sonido si no está muteado
+    if (!isMuted) {
+      const audio = new Audio(isCorrect ? '/correct.mp3' : '/incorrect.mp3');
+      audio.play().catch(console.error);
+    }
+
     setTimeout(() => {
       setShowGif(false);
-      setFeedbackMessage(isCorrect ? "¡Respuesta Correcta! 🎉" : "Respuesta Incorrecta 😞");
       setShowFeedback(true);
 
       if (isCorrect) {
@@ -91,8 +107,10 @@ const QuestionScreen: React.FC = () => {
           setCurrentQuestion((prev) => prev + 1);
           setRotation(0);
           setHitTarget(null);
-          setTimeLeft(5);
+          setTimeLeft(15);
           setIsAnswered(false);
+          // Anunciar nueva pregunta
+          setAnnouncement(`Nueva pregunta: ${questions[currentQuestion + 1]?.texto}`);
         }
       }, 2000);
     }, 2000);
@@ -104,10 +122,68 @@ const QuestionScreen: React.FC = () => {
     }
   };
 
+  const handleKeyNavigation = (e: React.KeyboardEvent) => {
+    if (isAnswered) return;
+
+    const options = questions[currentQuestion]?.opciones;
+    if (!options) return;
+
+    switch (e.key) {
+      case '1':
+      case '2':
+      case '3':
+        const idx = parseInt(e.key) - 1;
+        if (idx >= 0 && idx < options.length) {
+          handleAnswer(options[idx].correcta, idx);
+        }
+        break;
+      case 'ArrowLeft':
+        // Navegar a la opción anterior
+        break;
+      case 'ArrowRight':
+        // Navegar a la opción siguiente
+        break;
+      case 'Enter':
+      case ' ':
+        // Seleccionar opción actual
+        break;
+    }
+  };
+
+  const getProgressColor = (timeLeft: number) => {
+    if (timeLeft > 10) return "bg-green-500";
+    if (timeLeft > 5) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
+  const getButtonStyles = (option: any, idx: number) => {
+    if (hitTarget === null) return "bg-gray-300 hover:bg-gray-400";
+    
+    if (option.correcta) {
+      return "bg-green-500 hover:bg-green-600 text-white border-green-600 shadow-lg transform scale-105";
+    }
+    
+    if (hitTarget === idx && !option.correcta) {
+      return "bg-red-500 hover:bg-red-600 text-white border-red-600";
+    }
+    
+    return "bg-gray-300 opacity-50";
+  };
+
   if (!questions.length) return <div className="flex justify-center items-center h-screen">Cargando preguntas...</div>
 
   return (
-    <div className="relative p-6 bg-gradient-to-b  from-purple-100 to-indigo-100 min-h-screen flex flex-col items-center">
+    <div 
+      className="relative p-6 bg-gradient-to-b from-purple-100 to-indigo-100 min-h-screen flex flex-col items-center"
+      onKeyDown={handleKeyNavigation}
+      role="application"
+      aria-label="Pantalla de preguntas"
+    >
+      {/* Anun  ciador para lectores de pantalla */}
+      <div className="sr-only" role="status" aria-live="assertive" aria-atomic="true">
+        {announcement}
+      </div>
+
       <Card className="w-full max-w-2xl" role="main">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <Button variant="ghost" onClick={() => navigate("/levels")} className="p-0">
@@ -145,57 +221,90 @@ const QuestionScreen: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-bold text-lg">⭐ {stars}</span>
-            <span className="font-bold text-lg">❌ {strikes}/3</span>
+          <div className="flex justify-between items-center mb-4" role="status">
+            <span className="font-bold text-lg" aria-label={`${stars} estrellas conseguidas`}>
+              ⭐ {stars}
+            </span>
+            <span className="font-bold text-lg" aria-label={`${strikes} de 3 errores permitidos`}>
+              ❌ {strikes}/3
+            </span>
           </div>
-          <Progress value={(currentQuestion / questions.length) * 100} className="mb-4" />
-          <CardTitle className="text-2xl font-bold mb-4 text-center">{questions[currentQuestion].texto}</CardTitle>
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-full bg-blue-200 flex items-center justify-center text-2xl font-bold">
-              {timeLeft}
+          
+          {/* Barra de progreso de preguntas */}
+          <div className="mb-4">
+            <div className="flex justify-between mb-2 text-sm font-medium">
+              <span>Progreso</span>
+              <span>{currentQuestion + 1} de {questions.length}</span>
+            </div>
+            <Progress 
+              value={(currentQuestion / questions.length) * 100} 
+              className="h-2"
+              aria-label={`Pregunta ${currentQuestion + 1} de ${questions.length}`}
+            />
+          </div>
+
+          {/* Barra de tiempo */}
+          <div className="mb-4">
+            <div className="flex justify-between mb-2 text-sm font-medium">
+              <span>Tiempo restante</span>
+              <span>{timeLeft}s</span>
+            </div>
+            <div className="w-full bg-gray-200 h-2 rounded-full">
+              <div 
+                className={`h-full rounded-full transition-all duration-300 ${getProgressColor(timeLeft)}`}
+                style={{ width: `${(timeLeft / 15) * 100}%` }}
+                role="progressbar"
+                aria-valuenow={timeLeft}
+                aria-valuemin={0}
+                aria-valuemax={15}
+              />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4 mb-8 w-full max-w-4xl mx-auto">
-  {questions[currentQuestion].opciones.map((option:any, idx:any) => (
-    <motion.div
-      key={idx}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.5, delay: idx * 0.1 }}
-    >
-      <Button
-        onClick={() => !isAnswered && handleAnswer(option.correcta, idx)}
-        onKeyPress={handleKeyPress(option, idx)}
-        className={`w-full h-24 relative rounded-lg focus:ring-2 focus:ring-indigo-500
-          ${
-            hitTarget !== null // Verifica si ya se seleccionó una opción
-              ? option.correcta // Si es correcta, pinta verde
-                ? "bg-green-500"
-                : hitTarget === idx // Si es incorrecta y fue seleccionada, pinta rojo
-                ? "bg-red-500"
-                : "bg-gray-300" // El resto permanece gris
-              : "bg-gray-300 hover:bg-gray-400"
-          }`}
-        disabled={isAnswered} // Desactiva las lianas si ya se seleccionó una respuesta
-        tabIndex={0}
-        role="button"
-        aria-label={`Opción ${idx + 1}: ${option.texto}`}
-      >
-        <img
-          src={hitTarget === idx ? "/dianadestroy.png" : "/diana.png"}
-          alt="Diana"
-          className="w-16 h-16 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        />
-        <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white text-black text-xs px-2 py-1 rounded">
-          {option.texto}
-        </span>
-      </Button>
-    </motion.div>
-  ))}
-</div>
 
+          <CardTitle 
+            className="text-2xl font-bold mb-6 text-center"
+            role="heading"
+            aria-level={1}
+          >
+            {questions[currentQuestion]?.texto}
+          </CardTitle>
+
+          <div className="grid grid-cols-3 gap-4 mb-8 w-full max-w-4xl mx-auto" role="radiogroup">
+            {questions[currentQuestion]?.opciones.map((option:any, idx:any) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              >
+                <Button
+                  onClick={() => !isAnswered && handleAnswer(option.correcta, idx)}
+                  onKeyPress={handleKeyPress(option, idx)}
+                  className={`w-full h-24 relative rounded-lg transition-all duration-300 transform 
+                    ${getButtonStyles(option, idx)}
+                    focus:ring-2 focus:ring-indigo-500 focus:outline-none
+                  `}
+                  disabled={isAnswered}
+                  tabIndex={0}
+                  role="radio"
+                  aria-checked={hitTarget === idx}
+                  aria-label={`Opción ${idx + 1}: ${option.texto}`}
+                >
+                  <img
+                    src={hitTarget === idx ? "/dianadestroy.png" : "/diana.png"}
+                    alt="Diana"
+                    className={`w-16 h-16 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                      ${option.correcta && hitTarget !== null ? 'animate-bounce' : ''}
+                    `}
+                  />
+                  <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white text-black text-xs px-2 py-1 rounded shadow">
+                    {option.texto}
+                  </span>
+                </Button>
+              </motion.div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
