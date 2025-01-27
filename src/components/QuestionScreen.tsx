@@ -98,11 +98,17 @@ const QuestionScreen: React.FC = () => {
     }, 2000);
   };
 
+  const handleKeyPress = (option: any, idx: number) => (e: React.KeyboardEvent) => {
+    if ((e.key === 'Enter' || e.key === ' ') && !isAnswered) {
+      handleAnswer(option.correcta, idx);
+    }
+  };
+
   if (!questions.length) return <div className="flex justify-center items-center h-screen">Cargando preguntas...</div>
 
   return (
     <div className="relative p-6 bg-gradient-to-b  from-purple-100 to-indigo-100 min-h-screen flex flex-col items-center">
-      <Card className="w-full max-w-2xl">
+      <Card className="w-full max-w-2xl" role="main">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <Button variant="ghost" onClick={() => navigate("/levels")} className="p-0">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -161,7 +167,8 @@ const QuestionScreen: React.FC = () => {
     >
       <Button
         onClick={() => !isAnswered && handleAnswer(option.correcta, idx)}
-        className={`w-full h-24 relative rounded-lg 
+        onKeyPress={handleKeyPress(option, idx)}
+        className={`w-full h-24 relative rounded-lg focus:ring-2 focus:ring-indigo-500
           ${
             hitTarget !== null // Verifica si ya se seleccionó una opción
               ? option.correcta // Si es correcta, pinta verde
@@ -172,6 +179,9 @@ const QuestionScreen: React.FC = () => {
               : "bg-gray-300 hover:bg-gray-400"
           }`}
         disabled={isAnswered} // Desactiva las lianas si ya se seleccionó una respuesta
+        tabIndex={0}
+        role="button"
+        aria-label={`Opción ${idx + 1}: ${option.texto}`}
       >
         <img
           src={hitTarget === idx ? "/dianadestroy.png" : "/diana.png"}

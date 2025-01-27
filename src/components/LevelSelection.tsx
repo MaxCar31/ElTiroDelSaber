@@ -38,21 +38,29 @@ const LevelSelection: React.FC = () => {
     navigate(`/questions?level=${selectedLevel}`);
   };
 
+  const handleKeyPress = (level: string) => (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleLevelSelect(level);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-purple-100 to-indigo-100 p-4">
-      <motion.div
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full"
-      >
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-purple-100 to-indigo-100 p-4">
+      <motion.div role="main" tabIndex={-1}>
         <h1 className="text-4xl font-bold text-indigo-600 mb-6 text-center">Selecciona Nivel</h1>
         <p className="text-center text-gray-700 mb-6">
           Bienvenido, <span className="font-semibold">{playerName}</span>. ¡Selecciona un nivel para comenzar!
         </p>
         <div className="grid grid-cols-1 gap-4">
           {/* Nivel fácil */}
-          <Card onClick={() => handleLevelSelect("facil")} className="cursor-pointer hover:shadow-lg">
+          <Card 
+            onClick={() => handleLevelSelect("facil")} 
+            onKeyPress={handleKeyPress("facil")}
+            tabIndex={0}
+            role="button"
+            aria-label="Seleccionar nivel fácil"
+            className="cursor-pointer hover:shadow-lg focus:ring-2 focus:ring-indigo-500"
+          >
             <CardHeader>
               <CardTitle>
                 <Zap className="inline-block mr-2 text-yellow-500" />
@@ -65,7 +73,14 @@ const LevelSelection: React.FC = () => {
           </Card>
 
           {/* Nivel medio */}
-          <Card onClick={() => handleLevelSelect("medio")} className="cursor-pointer hover:shadow-lg">
+          <Card 
+            onClick={() => handleLevelSelect("medio")} 
+            onKeyPress={handleKeyPress("medio")}
+            tabIndex={0}
+            role="button"
+            aria-label="Seleccionar nivel medio"
+            className="cursor-pointer hover:shadow-lg focus:ring-2 focus:ring-indigo-500"
+          >
             <CardHeader>
               <CardTitle>
                 <Brain className="inline-block mr-2 text-blue-500" />
@@ -78,7 +93,14 @@ const LevelSelection: React.FC = () => {
           </Card>
 
           {/* Nivel difícil */}
-          <Card onClick={() => handleLevelSelect("dificil")} className="cursor-pointer hover:shadow-lg">
+          <Card 
+            onClick={() => handleLevelSelect("dificil")} 
+            onKeyPress={handleKeyPress("dificil")}
+            tabIndex={0}
+            role="button"
+            aria-label="Seleccionar nivel difícil"
+            className="cursor-pointer hover:shadow-lg focus:ring-2 focus:ring-indigo-500"
+          >
             <CardHeader>
               <CardTitle>
                 <Trophy className="inline-block mr-2 text-red-500" />
@@ -111,7 +133,11 @@ const LevelSelection: React.FC = () => {
 
         {/* Botón Volver */}
         <div className="flex justify-start mt-6">
-          <Button variant="outline" onClick={() => navigate("/")}>
+          <Button 
+            onClick={() => navigate("/")} 
+            className="w-full focus:ring-2 focus:ring-indigo-500"
+            tabIndex={0}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver
           </Button>

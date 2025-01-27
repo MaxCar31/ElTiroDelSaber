@@ -43,6 +43,12 @@ const WelcomeScreen: React.FC = () => {
     setError(null)
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleStart();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b  from-purple-100 to-indigo-100 p-4">
       <motion.div
@@ -50,8 +56,10 @@ const WelcomeScreen: React.FC = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full"
+        role="main"
+        tabIndex={-1}
       >
-        <h1 className="text-4xl font-bold text-indigo-600 mb-6 text-center">MATHHOOT!</h1>
+        <h1 className="text-4xl font-bold text-indigo-600 mb-6 text-center" tabIndex={0}>MATHHOOT!</h1>
         <div className="mb-4">
           <Label htmlFor="playerName" className="text-sm font-medium text-gray-700">
             Nombre del Jugador
@@ -61,24 +69,31 @@ const WelcomeScreen: React.FC = () => {
             id="playerName"
             value={playerName}
             onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
             placeholder="Ingresa tu nombre"
-            className="mt-1"
+            className="mt-1 focus:ring-2 focus:ring-indigo-500"
+            tabIndex={0}
+            aria-required="true"
           />
           {error && (
             <p className="text-red-500 text-sm mt-1 flex items-center">
-              <AlertCircle className="w-4 h-4 mr-1" />
+              <AlertCircle aria-label="Icono de error" role="img" className="w-4 h-4 mr-1" />
               {error}
             </p>
           )}
         </div>
-        <Button onClick={handleStart} className="w-full mb-4">
+        <Button 
+          onClick={handleStart} 
+          className="w-full mb-4 focus:ring-2 focus:ring-indigo-500"
+          tabIndex={0}
+        >
           Iniciar Juego
         </Button>
         <div className="flex justify-between">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <HelpCircle className="h-4 w-4" />
+              <Button variant="outline" size="icon" aria-label="Información">
+                <HelpCircle aria-label="Información" role="img" className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -99,7 +114,7 @@ const WelcomeScreen: React.FC = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button variant="outline" size="icon" onClick={() => setIsMuted(!isMuted)}>
+          <Button variant="outline" size="icon" onClick={() => setIsMuted(!isMuted)} aria-label={isMuted ? "Desactivar sonido" : "Activar sonido"}>
             {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </Button>
         </div>

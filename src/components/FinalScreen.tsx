@@ -66,11 +66,13 @@ const FinalScreen: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b  from-purple-100 to-indigo-100 p-4">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-purple-100 to-indigo-100 p-4">
       {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md" role="main" tabIndex={-1}>
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center mb-2">¡Juego Terminado!</CardTitle>
+          <CardTitle className="text-3xl font-bold text-center mb-2" tabIndex={0}>
+            ¡Juego Terminado!
+          </CardTitle>
           <CardDescription className="text-center text-lg">
             Nivel:{" "}
             <span className={`font-bold ${getLevelColor(level)}`}>
@@ -80,7 +82,7 @@ const FinalScreen: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center mb-4">
-            <Trophy className="w-16 h-16 text-yellow-500" />
+            <Trophy aria-label="Trofeo" role="img" className="w-16 h-16 text-yellow-500" />
           </div>
           <div className="text-center mb-6">
             <p className="text-2xl font-bold mb-2">
@@ -90,10 +92,18 @@ const FinalScreen: React.FC = () => {
           </div>
           <p className="text-center mb-6">{getPerformanceMessage(stars)}</p>
           <div className="flex flex-col gap-4">
-            <Button onClick={() => navigate("/levels")} className="w-full">
+            <Button 
+              onClick={() => navigate("/levels")} 
+              className="w-full focus:ring-2 focus:ring-indigo-500"
+              tabIndex={0}
+            >
               <RotateCcw className="mr-2 h-4 w-4" /> Jugar de nuevo
             </Button>
-            <Button onClick={() => navigate("/")} variant="outline" className="w-full">
+            <Button 
+              onClick={() => navigate("/")} 
+              className="w-full focus:ring-2 focus:ring-indigo-500"
+              tabIndex={0}
+            >
               <Home className="mr-2 h-4 w-4" /> Volver al inicio
             </Button>
             <AlertDialog>
